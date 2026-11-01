@@ -155,9 +155,11 @@ The delta stream can grow up to `$CFFF`, about 36 KB, before the assembler stops
 | `Man_blinking_in_pixel_art_618b030b.mp4` | the Google Flow video, read by `convert_blink.py` |
 | `convert_blink.py` | video → C64 frames, hold filter, first frame and change stream |
 | `player.asm` | full-screen player (ACME) |
-| `build.sh` | runs the converter if needed, assembles `blink.prg`, writes `blink.d64` |
-| `run_me.sh` | builds if anything changed, then starts VICE |
-| `frames/`, `preview/`, `data/` | extracted frames, C64 previews, data for the player |
+| `build.sh` | rebuilds only what's out of date: runs the converter if needed, assembles `blink.prg`, writes `blink.d64` |
+| `run_me.sh` | runs `build.sh`, then starts VICE |
+| `blink.prg.sha`, `data/source.sha` | content hashes `build.sh` uses to tell whether anything changed (committed) |
+| `data/` | first frame and change stream for the player (committed) |
+| `frames/`, `preview/` | extracted frames and C64 previews (git-ignored, recreated when needed) |
 | `blink.prg` | the program (22,511 bytes) |
 | `blink.d64` | 1541 disk image containing `BLINK` |
 | `vice.log` | VICE's log from the last run |
@@ -169,7 +171,9 @@ The delta stream can grow up to `$CFFF`, about 36 KB, before the assembler stops
 - **[VICE](https://vice-emu.sourceforge.io/)**: provides `x64sc` and `c1541`.
 - **[ACME](https://sourceforge.net/projects/acme-crossass/)**: the 6502 assembler (`brew install acme`).
 - **Python 3** with **Pillow** and **NumPy**.
-- **ffmpeg**: needed for the first conversion, to extract the frames.
+- **ffmpeg**: only needed when the video changes, to extract the frames.
+
+Python and ffmpeg are only needed when the video or converter changes, and ACME only when the player changes.
 
 ### In VICE
 
@@ -177,7 +181,7 @@ The delta stream can grow up to `$CFFF`, about 36 KB, before the assembler stops
 ./run_me.sh
 ```
 
-This rebuilds anything that's out of date, then opens VICE and plays the animation in a loop. No REU is needed. Extra arguments go straight to VICE; for example, `./run_me.sh -ntsc` runs it as an NTSC machine. To start it by hand instead:
+This rebuilds anything that's out of date, then opens VICE and plays the animation in a loop. A fresh clone is already up to date, so it starts straight away, with no conversion and no Python or ffmpeg needed. No REU is needed. Extra arguments go straight to VICE; for example, `./run_me.sh -ntsc` runs it as an NTSC machine. To start it by hand instead:
 
 ```sh
 x64sc -autostart blink.prg
@@ -202,4 +206,13 @@ These settings are at the top of `convert_blink.py`; run `./run_me.sh` afterward
 - **`DITHER_PENALTY`:** higher gives fewer dithered cells and flatter colors.
 - **`GAMMA`:** below 1 lightens the midtones.
 
-To use a different video, change `VIDEO` and delete `frames/` so it gets extracted again.
+To use a different video, either replace `Man_blinking_in_pixel_art_618b030b.mp4` or point `VIDEO` at a new file, then run `./run_me.sh`. It extracts the new frames and converts once; after that it starts straight away until the video or settings change again.
+
+`build.sh` decides what's out of date by comparing **content hashes**, not file dates. Git gives every file a new date on checkout, so dates can't be trusted after a clone. In detail:
+
+| What changed | What `build.sh` does |
+|--------------|----------------------|
+| nothing | nothing; finishes instantly |
+| `player.asm` or `build.sh` | reassembles `blink.prg` (under a second) |
+| `convert_blink.py` (settings) | reconverts (about 45 seconds), then reassembles |
+| the video file, or `VIDEO` | re-extracts frames (removing the old ones), reconverts, reassembles |
