@@ -6,6 +6,10 @@ This project contains two pixel-art portrait animations that play at 10fps in Co
 >
 > **[`/blink`](blink/README.md)**: change-only animation for limited-motion video. Runs on a standard C64.
 
+https://github.com/user-attachments/assets/735d3c0e-f709-428a-8f6d-f69b948449d1
+
+https://github.com/user-attachments/assets/ae53c951-2b67-4baf-9c19-ead9ecca161c
+
 | Folder | Approach | Use it when | Source used here | Runs on |
 |--------|----------|-------------|------------------|---------|
 | `reu/` | full-frame | most of the picture changes every frame: camera moves, moving backgrounds, live-action-style footage | `c64.mp4`, made with deliberately heavy motion as a stress test | expanded C64 with a **REU of 512 KB or more** |
