@@ -26,7 +26,7 @@ fi
 # 512 KB REU; fast virtual drive (KERNAL traps) so the 100 frames load in seconds.
 # VICE's startup chatter (missing CMD drive ROMs etc.) is harmless, so it goes to a log.
 mkdir -p build
-echo "starting VICE: frames load for a few seconds, then the animation loops (close the window to quit)"
+echo "starting VICE: the 100 frames load in about 40 seconds (one dot each), then the animation loops (close the window to quit)"
 if ! "$X64SC" "$@" -reu -reusize 512 +drive8truedrive -trapdevice8 -autostart c64anim.d81 >build/vice.log 2>&1; then
     echo "VICE exited with an error; last lines of build/vice.log:" >&2
     tail -5 build/vice.log >&2
