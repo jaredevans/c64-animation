@@ -74,7 +74,10 @@ Style:
 - No new colors; use only the colors already in the image
 - No text, no UI, no particles, no effects, no audio
 ```
+</details>
 
+
+https://github.com/user-attachments/assets/dba6d18b-1ca6-490a-9154-4561a01a2936
 
 
 ## 2. Converting to C64 hires (`convert_blink.py`)
