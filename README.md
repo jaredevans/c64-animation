@@ -37,13 +37,13 @@ Each folder has its own README with the full details. This page explains how the
 
 The difference comes from **how much motion each source video has**, and that was chosen on purpose at the two extremes.
 
-**`reu/` is the stress test.** `c64.mp4` was made with a lot of motion on purpose, to push the C64 to its limit and see how it would cope. The head moves, the expression changes, the background shifts and lights flicker. Its frames differ by about 3.7 brightness levels out of 255 on average, and after conversion about 260 of the 375 cells change every frame. With that much changing, storing only the changes saves almost nothing: every frame has to be stored whole. 100 frames come to 337 KB, which is five times the C64's 64 KB of RAM and twice what a 1541 disk holds. So everything is loaded into a REU first, and the REU's hardware copier (DMA) moves frames into view fast enough for 10fps.
+**`reu/` is the stress test.** `c64.mp4` was made with a lot of motion on purpose, to push the C64 to its limit and see how it would cope. The head moves, the expression changes, the background shifts and lights flicker.  With that much changing, storing only the changes saves almost nothing: every frame has to be stored whole. 100 frames come to 337 KB, which is five times the C64's 64 KB of RAM and twice what a 1541 disk holds. So everything is loaded into a REU first, and the REU's hardware copier (DMA) moves frames into view fast enough for 10fps.
 
 It works: the C64 does play that much motion at 10fps. The cost is expansion hardware, a long load on real drives, and a picture limited to a 15-column strip.
 
 **`blink/` is the opposite: motion kept to a minimum on purpose, and art designed for the C64:**
 
-- The still image was generated in **C64 palette colors**, at the C64's 16:10 shape, with flat shading and bold outlines. It took three tries, each checked by converting it and viewing it in VICE.
+- The still image was generated in **C64 palette colors**, at the C64's 16:10 shape, with flat shading and bold outlines. 
 - Google Flow was told to keep the **camera, body, background and lighting completely still**, and move only the eyes and brow.
 
 ## Shared techniques
@@ -55,7 +55,7 @@ Both converters use the same core method:
 - **Sticky colors:** a cell keeps its previous frame's color pair unless a new pair is clearly better, which reduces flicker.
 - **Smooth playback:** the screen is updated just after the picture is drawn, with PAL/NTSC detection so it runs at 10fps on both.
 
-## Lessons for the next animation
+## Lessons for next animations
 
 Start by deciding how much motion you want. For heavy motion, plan on the `reu/` approach and a REU. For an animation that runs on any standard C64, follow what made `blink/` work:
 

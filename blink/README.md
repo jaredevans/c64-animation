@@ -86,7 +86,7 @@ Style:
 
 ### Holding unchanged cells
 
-The Flow video is very steady: on average, frames differ by only 0.34 brightness levels out of 255. Converted naively, though, about **156 of the 1,000 cells changed every frame**, and 823 cells changed at some point. The cause was video compression noise flipping individual dither dots.
+The Flow video is very steady. Converted naively, though, about **156 of the 1,000 cells changed every frame**, and 823 cells changed at some point. The cause was video compression noise flipping individual dither dots.
 
 So the converter remembers, for each cell, the source pixels it was last converted from. It reconverts the cell only when the source has moved more than `HOLD = 2.0` away (mean CIELAB distance across the cell). Everything else keeps its previous bitmap and colors exactly.
 
@@ -112,7 +112,7 @@ The change stream holds one record per changed cell:
 bitmap addr hi, bitmap addr lo, screen addr hi, screen addr lo, 8 bitmap bytes, 1 screen byte
 ```
 
-A `0` byte ends a frame and `$FF` ends the stream. The last frame's changes lead back to frame 1, so the animation loops seamlessly.
+The last frame's changes lead back to frame 1, so the animation loops seamlessly.
 
 ## 3. The player (`player.asm`)
 
