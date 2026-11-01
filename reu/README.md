@@ -4,6 +4,10 @@ This project turns `c64.mp4`, a 10-second, 720×1280 pixel-art video of a portra
 
 The video was made with a lot of motion on purpose, as a stress test to push the C64 to its limit and see how it would handle it. Head, expression, background and lighting all change. That is why every frame is stored whole and played from a RAM Expansion Unit. For the opposite approach, with motion kept to a minimum on a standard C64, see [`../blink/`](../blink/README.md).
 
+
+https://github.com/user-attachments/assets/cd8a1182-1782-4c1d-964c-68b4e830043f
+
+
 ![Contact sheet of the 100 source frames](contact_sheet.png)
 
 ## 1. Extracting the frames
