@@ -10,3 +10,7 @@ reu/build/
 reu/demo_frames.asm
 blink/frames/
 blink/preview/
+
+# Screen recordings (uploaded to GitHub separately)
+/reu.mp4
+/blink.mp4

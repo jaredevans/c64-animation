@@ -19,8 +19,8 @@ Each folder has its own README with the full details. This page explains how the
 
 Screen recordings of both animations running in the VICE emulator:
 
-- **[`reu.mp4`](reu.mp4)** (24 s): the end of the REU loading screen, one dot per frame, then the full-frame stress-test animation playing in its 15-column strip.
-- **[`blink.mp4`](blink.mp4)** (20 s): the full-screen blinking spaceman, playing straight away on a standard C64 with no REU.
+- **`reu/`** (24 s): the end of the REU loading screen, one dot per frame, then the full-frame stress-test animation playing in its 15-column strip.
+- **`blink/`** (20 s): the full-screen blinking spaceman, playing straight away on a standard C64 with no REU.
 
 ## At a glance
 
