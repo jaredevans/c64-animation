@@ -7,9 +7,7 @@ cd "$(dirname "$0")" >/dev/null
 X64SC=$(command -v x64sc || echo /Applications/vice-arm64-gtk3-3.10/bin/x64sc)
 [ -x "$X64SC" ] || { echo "x64sc (VICE) not found" >&2; exit 1; }
 
-if [ ! -f blink.prg ] || [ -n "$(find player.asm convert_blink.py build.sh data -newer blink.prg 2>/dev/null | head -1)" ]; then
-    ./build.sh
-fi
+./build.sh                  # does nothing if blink.prg is up to date
 
 # No REU needed: the whole animation fits in C64 RAM. The PRG is injected straight into memory.
 # VICE's startup chatter (missing CMD drive ROMs etc.) is harmless, so it goes to a log.
