@@ -116,15 +116,16 @@ VICE's fast virtual drive intercepts the KERNAL's load routine and reads the dis
 | File | Purpose |
 |------|---------|
 | `c64.mp4` | source video |
-| `frames/` | 100 extracted PNG frames |
+| `frames/` | 100 extracted PNG frames (git-ignored, recreated when needed) |
 | `contact_sheet.png` | all frames in one image |
 | `convert_c64.py` | PNG → C64 hires converter |
-| `c64/` | converted bitmap/screen data and previews |
+| `c64/` | converted bitmap/screen data (committed) and previews (git-ignored) |
 | `demo.asm`, `build_demo.sh` | 10-frame in-RAM test player (no REU needed); `build_demo.sh` writes `demo_frames.asm` and `demo.prg` |
 | `player.asm`, `build_player.sh` | REU player and disk builder |
 | `build/` | intermediate files (row-by-row frame files, assembled player) |
 | `c64anim.d81` | bootable disk: player plus 100 frame files |
-| `run_me.sh` | builds anything that's out of date and starts VICE |
+| `c64anim.d81.sha`, `c64/source.sha` | content hashes `run_me.sh` uses to tell whether anything changed (committed) |
+| `run_me.sh` | rebuilds only what's out of date and starts VICE |
 
 ## How to run it
 
@@ -133,7 +134,9 @@ VICE's fast virtual drive intercepts the KERNAL's load routine and reads the dis
 - **[VICE](https://vice-emu.sourceforge.io/)**: provides `x64sc` and `c1541`.
 - **[ACME](https://sourceforge.net/projects/acme-crossass/)**: the 6502 assembler (`brew install acme`).
 - **Python 3** with **Pillow** and **NumPy**.
-- **ffmpeg**: only needed if `frames/` has to be regenerated.
+- **ffmpeg**: only needed when the video or converter changes, to extract the frames.
+
+Python and ffmpeg are only needed when the video or converter changes, and ACME only when the player changes.
 
 ### In VICE
 
@@ -141,11 +144,18 @@ VICE's fast virtual drive intercepts the KERNAL's load routine and reads the dis
 ./run_me.sh
 ```
 
-The script rebuilds only what's missing or out of date:
+The script rebuilds only what's out of date. A fresh clone is already up to date, so it goes straight to VICE.
 
-- frames from the video;
-- the C64 conversion, when `convert_c64.py` changes;
-- the disk image, when `player.asm`, `build_player.sh` or the frame data changes.
+It decides what's out of date by comparing **content hashes**, not file dates. Git gives every file a new date on checkout, so dates can't be trusted after a clone. In detail:
+
+| What changed | What `run_me.sh` does |
+|--------------|-----------------------|
+| nothing | nothing; starts VICE straight away |
+| `player.asm` or `build_player.sh` | rebuilds the disk image (a few seconds) |
+| `convert_c64.py` (settings) | extracts frames if needed, reconverts, rebuilds the disk |
+| `c64.mp4` | re-extracts frames (removing the old ones), reconverts, rebuilds the disk |
+
+The player uses frames 1–100, so a replacement video must be at least 10 seconds long. Anything after 10 seconds is ignored, and a shorter video stops the disk build with a missing-frame error.
 
 It then starts `x64sc` with a 512 KB REU and the fast virtual drive. The frames load in about 40 seconds, one dot per frame, then the animation plays. Any extra arguments go straight to VICE. For example, `./run_me.sh -ntsc` runs it as an NTSC machine.
 
@@ -159,7 +169,7 @@ x64sc -reu -reusize 512 +drive8truedrive -trapdevice8 -autostart c64anim.d81
 
 The demo plays a short stretch of the animation entirely from C64 RAM, so it needs **no REU and no disk loading**. It's useful for quickly checking a few frames, or for showing the animation on a standard C64.
 
-The demo uses the converted frames in `c64/`. If that folder doesn't exist yet, run `./run_me.sh` or `python3 convert_c64.py` once first.
+The demo uses the converted frames in `c64/`, which are committed, so it builds straight after a clone. If you change the converter or video, run `./run_me.sh` first so `c64/` is up to date.
 
 ```sh
 ./build_demo.sh                  # frames 11–20 (includes a blink)
@@ -195,4 +205,4 @@ Expect a load of over 10 minutes from a real 1581 before playback starts (see th
 
 ### Changing the look
 
-Edit `DITHER_PENALTY` or `GAMMA` at the top of `convert_c64.py`, then run `./run_me.sh` again. It will reconvert the frames and rebuild the disk automatically.
+Edit `DITHER_PENALTY` or `GAMMA` at the top of `convert_c64.py`, then run `./run_me.sh` again. It reconverts the frames and rebuilds the disk once; later runs start straight away until something changes again.
