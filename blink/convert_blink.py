@@ -2,7 +2,7 @@
 """Convert the Google Flow video into a full-screen C64 hires animation (40x25 cells, 320x200 px).
 
 Writes:
-  frames/frame_NNN.png   frames extracted from the video at FPS
+  frames/frame_NNN.png   frames extracted from the video at FPS (re-extracted when the video changes)
   preview/frame_NNN.png  each frame as it looks on the C64 (3x)
   data/bitmap.bin        8000 bytes: first frame's bitmap ($2000 layout)
   data/screen.bin        1000 bytes: first frame's screen RAM (high nibble = 1-bit color)
@@ -18,6 +18,7 @@ cells per frame. A cell is only reconverted when its source pixels have moved mo
 eyes, mouth - ends up in the delta stream.
 """
 import glob
+import hashlib
 import os
 import subprocess
 import sys
@@ -137,13 +138,24 @@ def delta(old, new):
 
 def main():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # Re-extract whenever the video or FPS changes; old frames are removed first, so a shorter
+    # video can't leave stale frames behind.
     os.makedirs("frames", exist_ok=True)
-    if not os.path.exists("frames/frame_001.png"):
+    with open(VIDEO, "rb") as f:
+        source = f"{hashlib.sha1(f.read()).hexdigest()} fps={FPS}\n"
+    stamp = "frames/source.txt"
+    if not os.path.exists(stamp) or open(stamp).read() != source:
+        for old in glob.glob("frames/frame_*.png"):
+            os.remove(old)
+        print(f"extracting frames from {VIDEO}...")
         subprocess.run(["ffmpeg", "-v", "error", "-i", VIDEO, "-vf", f"fps={FPS}", "frames/frame_%03d.png"], check=True)
+        open(stamp, "w").write(source)
     files = sorted(glob.glob("frames/frame_*.png"))
     if not files:
         sys.exit("no frames extracted")
     os.makedirs("preview", exist_ok=True)
+    for old in glob.glob("preview/frame_*.png"):
+        os.remove(old)
     os.makedirs("data", exist_ok=True)
 
     states = []
